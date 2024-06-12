@@ -34,11 +34,14 @@
       </table>
   
       <button @click="saveTimeEntries">Save</button>
+      <button @click="downloadPDF">Download PDF</button>
     </div>
   </template>
   
   <script>
   import axios from 'axios';
+  import jsPDF from 'jspdf';
+  import 'jspdf-autotable';
   
   export default {
     data() {
@@ -57,7 +60,7 @@
   
         try {
           // Fetch saved entries for the selected month
-          const response = await axios.get('http://localhost:3000/get-entries', {
+          const response = await axios.get(`http://localhost:3000/get-entries`, {
             params: {
               year,
               month: monthIndex.toString().padStart(2, '0') // Ensure month is two digits
@@ -123,6 +126,27 @@
         } else {
           console.log("No entries with total time to save.");
         }
+      },
+      downloadPDF() {
+        const doc = new jsPDF();
+        doc.text('Timesheet', 20, 10);
+  
+        const columns = ["Date", "Start Time", "End Time", "Lunch Break (min)", "Total (hours)"];
+        const rows = this.timeEntries.map(entry => [
+          entry.date,
+          entry.startTime,
+          entry.endTime,
+          entry.lunch,
+          entry.total
+        ]);
+  
+        doc.autoTable({
+          head: [columns],
+          body: rows,
+          startY: 20
+        });
+  
+        doc.save(`Timesheet_${this.months[this.selectedMonth - 1]}_${new Date().getFullYear()}.pdf`);
       }
     }
   }
