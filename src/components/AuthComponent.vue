@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-md mx-auto">
-    <div v-if="!token">
+    <div v-if="formType === 'register'">
       <h2 class="text-xl font-bold mb-4">Register</h2>
       <form @submit.prevent="register" class="mb-4">
         <div class="mb-3">
@@ -11,7 +11,8 @@
         </div>
         <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded w-full">Register</button>
       </form>
-
+    </div>
+    <div v-else-if="formType === 'login'">
       <h2 class="text-xl font-bold mb-4">Login</h2>
       <form @submit.prevent="login">
         <div class="mb-3">
@@ -31,6 +32,16 @@ import axios from 'axios';
 
 export default {
   name: 'AuthComponent',
+  props: {
+    showForm: {
+      type: Boolean,
+      default: false
+    },
+    formType: {
+      type: String,
+      default: 'login'
+    }
+  },
   data() {
     return {
       registerUsername: '',
@@ -48,6 +59,7 @@ export default {
           password: this.registerPassword
         });
         alert(response.data.message);
+        this.$emit('toggleRegister'); // Hide the registration form after successful registration
       } catch (error) {
         console.error('Registration failed:', error);
       }
