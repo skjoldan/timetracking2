@@ -1,40 +1,40 @@
 <template>
     <div>
-      <select v-model="selectedMonth" @change="createMonth">
+      <select v-model="selectedMonth" @change="createMonth" class="form-select mb-3 border rounded px-4 py-2">
         <option v-for="(month, index) in months" :key="index" :value="index + 1">
           {{ month }}
         </option>
       </select>
   
-      <table>
+      <table class="table-auto w-full border-collapse border border-gray-200">
         <thead>
-          <tr>
-            <th>Date</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Lunch Break (min)</th>
-            <th>Total (hours)</th>
+          <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2">Date</th>
+            <th class="border border-gray-300 px-4 py-2">Start Time</th>
+            <th class="border border-gray-300 px-4 py-2">End Time</th>
+            <th class="border border-gray-300 px-4 py-2">Lunch Break (min)</th>
+            <th class="border border-gray-300 px-4 py-2">Total (hours)</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(entry, index) in timeEntries" :key="index">
-            <td>{{ entry.date }}</td>
-            <td>
-              <input type="time" v-model="entry.startTime" @change="calculateTotal(index)">
+          <tr v-for="(entry, index) in timeEntries" :key="index" class="border-b">
+            <td class="border border-gray-300 px-4 py-2">{{ entry.date }}</td>
+            <td class="border border-gray-300 px-4 py-2">
+              <input type="time" v-model="entry.startTime" @change="calculateTotal(index)" class="form-input border rounded px-4 py-2">
             </td>
-            <td>
-              <input type="time" v-model="entry.endTime" @change="calculateTotal(index)">
+            <td class="border border-gray-300 px-4 py-2">
+              <input type="time" v-model="entry.endTime" @change="calculateTotal(index)" class="form-input border rounded px-4 py-2">
             </td>
-            <td>
-              <input type="number" min="0" v-model.number="entry.lunch" @change="calculateTotal(index)">
+            <td class="border border-gray-300 px-4 py-2">
+              <input type="number" min="0" v-model.number="entry.lunch" @change="calculateTotal(index)" class="form-input border rounded px-4 py-2">
             </td>
-            <td>{{ entry.total }}</td>
+            <td class="border border-gray-300 px-4 py-2">{{ entry.total }}</td>
           </tr>
         </tbody>
       </table>
   
-      <button @click="saveTimeEntries">Save</button>
-      <button @click="downloadPDF">Download PDF</button>
+      <button @click="saveTimeEntries" class="bg-green-500 text-white px-4 py-2 rounded mt-3">Save</button>
+      <button @click="downloadPDF" class="bg-gray-500 text-white px-4 py-2 rounded mt-3 ml-3">Download PDF</button>
     </div>
   </template>
   
@@ -48,7 +48,8 @@
       return {
         selectedMonth: null,
         months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        timeEntries: []
+        timeEntries: [],
+        token: localStorage.getItem('token') || ''
       };
     },
     methods: {
@@ -61,6 +62,7 @@
         try {
           // Fetch saved entries for the selected month
           const response = await axios.get(`http://localhost:3000/get-entries`, {
+            headers: { Authorization: `Bearer ${this.token}` },
             params: {
               year,
               month: monthIndex.toString().padStart(2, '0') // Ensure month is two digits
@@ -113,7 +115,9 @@
   
         if (entriesToSave.length > 0) {
           try {
-            const response = await axios.post('http://localhost:3000/add-entry', entriesToSave);
+            const response = await axios.post('http://localhost:3000/add-entry', entriesToSave, {
+              headers: { Authorization: `Bearer ${this.token}` }
+            });
             if (response.data.status === 'OK') {
               alert('Entries submitted successfully!');
             } else {
@@ -149,7 +153,7 @@
         doc.save(`Timesheet_${this.months[this.selectedMonth - 1]}_${new Date().getFullYear()}.pdf`);
       }
     }
-  }
+  };
   </script>
   
   <style scoped>

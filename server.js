@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const app = express();
 app.use(cors());
@@ -19,25 +21,57 @@ db.connect((err) => {
   console.log('Connected to the database');
 });
 
-app.post('/add-entry', function(req, res) {
-  const entries = req.body;
+const jwtSecret = 'your_secret_key';
 
-  entries.forEach(entry => {
-    const { date, startTime, endTime, lunch, total } = entry;
+// User Registration
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-    if (total > 0) {
-      const query = 'INSERT INTO time_entries (Date, StartTime, EndTime, LunchTime, Total) VALUES (?, ?, ?, ?, ?)';
-      db.query(query, [date, startTime, endTime, lunch, total], function(error, results, fields) {
-        if (error) throw error;
-        console.log('Entry added successfully:', { date, startTime, endTime, lunch, total });
-      });
-    }
+  const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
+  db.query(query, [username, hashedPassword], (error, results) => {
+    if (error) return res.status(500).send(error);
+    res.send({ message: 'User registered successfully' });
   });
-
-  res.send({ status: 'OK', message: 'Entries received' });
 });
 
-app.get('/get-entries', function(req, res) {
+// User Login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  const query = 'SELECT * FROM users WHERE username = ?';
+  db.query(query, [username], async (error, results) => {
+    if (error) return res.status(500).send(error);
+    if (results.length === 0) return res.status(401).send({ message: 'Invalid credentials' });
+
+    const user = results[0];
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) return res.status(401).send({ message: 'Invalid credentials' });
+
+    const token = jwt.sign({ username: user.username }, jwtSecret, { expiresIn: '1h' });
+    res.send({ token });
+  });
+});
+
+// Middleware to protect routes
+const authenticate = (req, res, next) => {
+  const token = req.header('Authorization').replace('Bearer ', '');
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    req.user = decoded;
+    next();
+  } catch (e) {
+    res.status(401).send({ message: 'Please authenticate' });
+  }
+};
+
+// Example Protected Route
+app.get('/protected', authenticate, (req, res) => {
+  res.send({ message: 'This is a protected route', user: req.user });
+});
+
+// Get Entries
+app.get('/get-entries', authenticate, (req, res) => {
   const { year, month } = req.query;
   const monthString = month.toString().padStart(2, '0'); // Ensure month is two digits
   const startDate = `${year}-${monthString}-01`;
