@@ -54,10 +54,12 @@ export default {
   methods: {
     async register() {
       try {
+        console.log('Registering user:', this.registerUsername);
         const response = await axios.post('/register', {
           username: this.registerUsername,
           password: this.registerPassword
         });
+        console.log('Register response:', response.data);
         alert(response.data.message);
         this.$emit('toggleRegister'); // Hide the registration form after successful registration
       } catch (error) {
@@ -66,10 +68,12 @@ export default {
     },
     async login() {
       try {
+        console.log('Logging in user:', this.username);
         const response = await axios.post('/login', {
           username: this.username,
           password: this.password
         });
+        console.log('Login response:', response.data);
         this.token = response.data.token;
         this.$emit('login', this.token);  // Emit login event with token
       } catch (error) {

@@ -25,24 +25,32 @@ db.connect((err) => {
 const jwtSecret = 'your_secret_key';
 
 // User Registration
-app.post('/api/register', async (req, res) => { // Note the `/api` prefix
+app.post('/api/register', async (req, res) => {
+  console.log('Register request received:', req.body);
   const { username, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
   db.query(query, [username, hashedPassword], (error, results) => {
-    if (error) return res.status(500).send(error);
+    if (error) {
+      console.error('Error during registration:', error);
+      return res.status(500).send(error);
+    }
     res.send({ message: 'User registered successfully' });
   });
 });
 
 // User Login
-app.post('/api/login', (req, res) => { // Note the `/api` prefix
+app.post('/api/login', (req, res) => {
+  console.log('Login request received:', req.body);
   const { username, password } = req.body;
 
   const query = 'SELECT * FROM users WHERE username = ?';
   db.query(query, [username], async (error, results) => {
-    if (error) return res.status(500).send(error);
+    if (error) {
+      console.error('Error during login:', error);
+      return res.status(500).send(error);
+    }
     if (results.length === 0) return res.status(401).send({ message: 'Invalid credentials' });
 
     const user = results[0];
@@ -67,16 +75,17 @@ const authenticate = (req, res, next) => {
 };
 
 // Example Protected Route
-app.get('/api/protected', authenticate, (req, res) => { // Note the `/api` prefix
+app.get('/api/protected', authenticate, (req, res) => {
   res.send({ message: 'This is a protected route', user: req.user });
 });
 
 // Get Entries
-app.get('/api/get-entries', authenticate, (req, res) => { // Note the `/api` prefix
+app.get('/api/get-entries', authenticate, (req, res) => {
+  console.log('Get entries request received:', req.query);
   const { year, month } = req.query;
-  const monthString = month.toString().padStart(2, '0'); // Ensure month is two digits
+  const monthString = month.toString().padStart(2, '0');
   const startDate = `${year}-${monthString}-01`;
-  const endDate = `${year}-${monthString}-` + new Date(year, month, 0).getDate().toString().padStart(2, '0'); // Last day of the month
+  const endDate = `${year}-${monthString}-` + new Date(year, month, 0).getDate().toString().padStart(2, '0');
 
   console.log('Date Range:', { startDate, endDate });
 
@@ -84,10 +93,13 @@ app.get('/api/get-entries', authenticate, (req, res) => { // Note the `/api` pre
   console.log('Executing query:', query, 'with parameters:', [startDate, endDate]);
 
   db.query(query, [startDate, endDate], function(error, results, fields) {
-    if (error) throw error;
+    if (error) {
+      console.error('Error during get-entries:', error);
+      throw error;
+    }
     const formattedResults = results.map(entry => ({
       ...entry,
-      Date: entry.Date.toISOString().slice(0, 10) // Convert Date to 'YYYY-MM-DD'
+      Date: entry.Date.toISOString().slice(0, 10)
     }));
     console.log('Retrieved entries:', formattedResults);
     res.send(formattedResults);
