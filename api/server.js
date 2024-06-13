@@ -51,16 +51,24 @@ app.post('/api/login', (req, res) => {
       console.error('Error during login:', error);
       return res.status(500).send(error);
     }
-    if (results.length === 0) return res.status(401).send({ message: 'Invalid credentials' });
+    if (results.length === 0) {
+      console.log('Invalid credentials for user:', username);
+      return res.status(401).send({ message: 'Invalid credentials' });
+    }
 
     const user = results[0];
     const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) return res.status(401).send({ message: 'Invalid credentials' });
+    if (!passwordMatch) {
+      console.log('Invalid credentials for user:', username);
+      return res.status(401).send({ message: 'Invalid credentials' });
+    }
 
     const token = jwt.sign({ username: user.username }, jwtSecret, { expiresIn: '1h' });
+    console.log('Login successful for user:', username);
     res.send({ token });
   });
 });
+
 
 // Middleware to protect routes
 const authenticate = (req, res, next) => {
