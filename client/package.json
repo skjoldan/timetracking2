@@ -1,5 +1,5 @@
 {
-  "name": "timetracking2",
+  "name": "timetracking-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,13 +9,9 @@
   },
   "dependencies": {
     "axios": "^1.7.2",
-    "bcrypt": "^5.1.1",
     "core-js": "^3.8.3",
-    "cors": "^2.8.5",
-    "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
-    "mysql": "^2.18.1",
     "vue": "^3.2.13"
   },
   "devDependencies": {

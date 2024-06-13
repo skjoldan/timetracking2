@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-md mx-auto">
+  <div class="max-w-md mx-auto mt-4">
     <div v-if="formType === 'register'">
       <h2 class="text-xl font-bold mb-4">Register</h2>
       <form @submit.prevent="register" class="mb-4">
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from '../axios-config';
 
 export default {
   name: 'AuthComponent',
@@ -54,7 +54,7 @@ export default {
   methods: {
     async register() {
       try {
-        const response = await axios.post('http://localhost:3000/register', {
+        const response = await axios.post('/register', {
           username: this.registerUsername,
           password: this.registerPassword
         });
@@ -66,7 +66,7 @@ export default {
     },
     async login() {
       try {
-        const response = await axios.post('http://localhost:3000/login', {
+        const response = await axios.post('/login', {
           username: this.username,
           password: this.password
         });

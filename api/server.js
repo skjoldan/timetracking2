@@ -4,6 +4,7 @@ const mysql = require('mysql');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -24,7 +25,7 @@ db.connect((err) => {
 const jwtSecret = 'your_secret_key';
 
 // User Registration
-app.post('/register', async (req, res) => {
+app.post('/api/register', async (req, res) => { // Note the `/api` prefix
   const { username, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -36,7 +37,7 @@ app.post('/register', async (req, res) => {
 });
 
 // User Login
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => { // Note the `/api` prefix
   const { username, password } = req.body;
 
   const query = 'SELECT * FROM users WHERE username = ?';
@@ -66,12 +67,12 @@ const authenticate = (req, res, next) => {
 };
 
 // Example Protected Route
-app.get('/protected', authenticate, (req, res) => {
+app.get('/api/protected', authenticate, (req, res) => { // Note the `/api` prefix
   res.send({ message: 'This is a protected route', user: req.user });
 });
 
 // Get Entries
-app.get('/get-entries', authenticate, (req, res) => {
+app.get('/api/get-entries', authenticate, (req, res) => { // Note the `/api` prefix
   const { year, month } = req.query;
   const monthString = month.toString().padStart(2, '0'); // Ensure month is two digits
   const startDate = `${year}-${monthString}-01`;
@@ -93,6 +94,15 @@ app.get('/get-entries', authenticate, (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+// Serve the static files from the Vue.js app
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+// All other requests not handled will return the Vue app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
