@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import axios from '../axios-config';
+import axiosInstance from '../axios-config';
 
 export default {
   name: 'AuthComponent',
@@ -55,7 +55,7 @@ export default {
     async register() {
       try {
         console.log('Registering user:', this.registerUsername);
-        const response = await axios.post('/api/register', {
+        const response = await axiosInstance.post('/register', {
           username: this.registerUsername,
           password: this.registerPassword
         });
@@ -69,7 +69,7 @@ export default {
     async login() {
       try {
         console.log('Logging in user:', this.username);
-        const response = await axios.post('/api/login', {
+        const response = await axiosInstance.post('/login', {
           username: this.username,
           password: this.password
         });
