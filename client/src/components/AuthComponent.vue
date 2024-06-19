@@ -55,7 +55,7 @@ export default {
     async register() {
       try {
         console.log('Registering user:', this.registerUsername);
-        const response = await axios.post('/register', {
+        const response = await axios.post('/api/register', {
           username: this.registerUsername,
           password: this.registerPassword
         });
@@ -69,12 +69,13 @@ export default {
     async login() {
       try {
         console.log('Logging in user:', this.username);
-        const response = await axios.post('/login', {
+        const response = await axios.post('/api/login', {
           username: this.username,
           password: this.password
         });
         console.log('Login response:', response.data);
         this.token = response.data.token;
+        localStorage.setItem('token', this.token);  // Store the token
         this.$emit('login', this.token);  // Emit login event with token
       } catch (error) {
         console.error('Login failed:', error);

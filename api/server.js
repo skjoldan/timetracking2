@@ -69,7 +69,6 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-
 // Middleware to protect routes
 const authenticate = (req, res, next) => {
   const token = req.header('Authorization').replace('Bearer ', '');
@@ -87,6 +86,27 @@ app.get('/api/protected', authenticate, (req, res) => {
   res.send({ message: 'This is a protected route', user: req.user });
 });
 
+// Add Entries
+app.post('/api/add-entry', authenticate, (req, res) => {
+  const entries = req.body;
+  const username = req.user.username;
+
+  entries.forEach(entry => {
+    console.log('Entry:', entry);
+    const { date, startTime, endTime, lunch, total } = entry;
+    const query = 'INSERT INTO time_entries (Date, StartTime, EndTime, LunchTime, Total, username) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(query, [date, startTime, endTime, lunch, total, username], (error, results) => {
+      if (error) {
+        console.error('Error adding entry:', error);
+        throw error;
+      }
+      console.log('Entry added successfully');
+    });
+  });
+
+  res.send({ status: 'OK', message: 'Entries received' });
+});
+
 // Get Entries
 app.get('/api/get-entries', authenticate, (req, res) => {
   console.log('Get entries request received:', req.query);
@@ -94,13 +114,14 @@ app.get('/api/get-entries', authenticate, (req, res) => {
   const monthString = month.toString().padStart(2, '0');
   const startDate = `${year}-${monthString}-01`;
   const endDate = `${year}-${monthString}-` + new Date(year, month, 0).getDate().toString().padStart(2, '0');
+  const username = req.user.username;
 
   console.log('Date Range:', { startDate, endDate });
 
-  const query = 'SELECT * FROM time_entries WHERE Date BETWEEN ? AND ?';
-  console.log('Executing query:', query, 'with parameters:', [startDate, endDate]);
+  const query = 'SELECT * FROM time_entries WHERE Date BETWEEN ? AND ? AND username = ?';
+  console.log('Executing query:', query, 'with parameters:', [startDate, endDate, username]);
 
-  db.query(query, [startDate, endDate], function(error, results, fields) {
+  db.query(query, [startDate, endDate, username], function(error, results, fields) {
     if (error) {
       console.error('Error during get-entries:', error);
       throw error;
