@@ -11,7 +11,10 @@ const app = express();
 // CORS configuration
 const corsOptions = {
   origin: 'https://timetracking-ux1q.onrender.com', // Replace with your frontend URL
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 };
 
 app.use(cors(corsOptions));
