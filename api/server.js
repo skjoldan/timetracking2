@@ -7,7 +7,14 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 
 const app = express();
-app.use(cors());
+
+// CORS configuration
+const corsOptions = {
+  origin: 'https://timetracking-ux1q.onrender.com', // Replace with your frontend URL
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 const db = mysql.createConnection({
