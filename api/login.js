@@ -3,11 +3,14 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const db = mysql.createConnection({
-  host: 'mysql9.unoeuro.com',
-  user: 'flying_hippo_studio',
-  password: 'D3EgzknAwp25bRxd4aBH',
-  database: 'flying_hippo_studio_db_timesheet'
-});
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+  });
+  
+  const jwtSecret = process.env.JWT_SECRET;
+  
 
 const jwtSecret = 'your_secret_key';
 
