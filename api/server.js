@@ -11,23 +11,15 @@ const app = express();
 // CORS configuration
 const corsOptions = {
   origin: 'https://timetracking-ux1q.onrender.com', // Your frontend URL
-  optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
-
-// Manually handle the OPTIONS preflight request to ensure proper headers are sent
-app.options('*', (req, res) => {
-  console.log('Handling OPTIONS request');
-  res.header('Access-Control-Allow-Origin', 'https://timetracking-ux1q.onrender.com');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);
-});
+app.options('*', cors(corsOptions));
 
 app.use(bodyParser.json());
 
