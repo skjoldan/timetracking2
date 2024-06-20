@@ -10,7 +10,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: 'https://timetracking-ux1q.onrender.com', // Replace with your frontend URL
+  origin: 'https://timetracking-ux1q.onrender.com', // Your frontend URL
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -23,6 +23,13 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
 app.use(bodyParser.json());
+
+// Logging middleware to help debug
+app.use((req, res, next) => {
+  console.log(`Request Method: ${req.method}, Request URL: ${req.url}`);
+  console.log('Request Headers:', req.headers);
+  next();
+});
 
 const db = mysql.createConnection({
   host: 'mysql9.unoeuro.com',
