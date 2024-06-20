@@ -18,6 +18,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Manually handle the OPTIONS preflight request to ensure proper headers are sent
+app.options('*', cors(corsOptions));
+
 app.use(bodyParser.json());
 
 const db = mysql.createConnection({
