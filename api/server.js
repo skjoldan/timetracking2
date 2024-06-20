@@ -26,7 +26,7 @@ db.connect((err) => {
 const jwtSecret = 'your_secret_key';
 
 // User Registration
-app.post('/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
   console.log('Register request received:', req.body);
   const { username, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,7 +42,7 @@ app.post('/register', async (req, res) => {
 });
 
 // User Login
-app.post('/login', (req, res) => {
+app.post('/api/login', (req, res) => {
   console.log('Login request received:', req.body);
   const { username, password } = req.body;
 
@@ -71,7 +71,7 @@ app.post('/login', (req, res) => {
 });
 
 // Example Protected Route
-app.get('/protected', (req, res) => {
+app.get('/api/protected', (req, res) => {
   const token = req.header('Authorization').replace('Bearer ', '');
   try {
     const decoded = jwt.verify(token, jwtSecret);
