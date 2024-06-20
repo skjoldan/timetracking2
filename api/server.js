@@ -21,6 +21,7 @@ app.use(cors(corsOptions));
 
 // Manually handle the OPTIONS preflight request to ensure proper headers are sent
 app.options('*', (req, res) => {
+  console.log('Handling OPTIONS request');
   res.header('Access-Control-Allow-Origin', 'https://timetracking-ux1q.onrender.com');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
