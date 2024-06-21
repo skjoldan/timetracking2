@@ -1,9 +1,12 @@
 const jwt = require('jsonwebtoken');
 
-const jwtSecret = 'your_secret_key';
+const jwtSecret = process.env.JWT_SECRET;
 
-export function authenticate(req, res, next) {
-  const token = req.headers.authorization.split(' ')[1];
+function authenticate(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).send({ message: 'Authentication token missing' });
+  }
   try {
     const decoded = jwt.verify(token, jwtSecret);
     req.user = decoded;
@@ -12,3 +15,5 @@ export function authenticate(req, res, next) {
     res.status(401).send({ message: 'Please authenticate' });
   }
 }
+
+module.exports = authenticate;

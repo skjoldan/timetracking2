@@ -42,14 +42,14 @@
 </template>
 
 <script>
-import axios from '../axios-config';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import axios from '../axios-config';
 
 export default {
   data() {
     return {
-      selectedMonth: null,
+      selectedMonth: new Date().getMonth() + 1,
       months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
       timeEntries: [],
       token: localStorage.getItem('token') || ''
@@ -76,7 +76,7 @@ export default {
         console.log('Saved Entries:', savedEntries);
 
         const daysInMonth = new Date(year, monthIndex, 0).getDate();
-        
+
         this.timeEntries = Array.from({ length: daysInMonth }, (_, i) => {
           const date = new Date(year, monthIndex - 1, i + 1).toISOString().slice(0, 10);
           const savedEntry = savedEntries.find(entry => entry.Date === date);
@@ -91,6 +91,8 @@ export default {
               }
             : { date, startTime: '', endTime: '', lunch: 0, total: 0 };
         });
+
+        console.log('Time Entries after processing:', this.timeEntries);
       } catch (error) {
         console.error('Error fetching saved entries:', error);
       }
@@ -155,9 +157,13 @@ export default {
 
       doc.save(`Timesheet_${this.months[this.selectedMonth - 1]}_${new Date().getFullYear()}.pdf`);
     }
+  },
+  mounted() {
+    this.createMonth();
   }
 };
 </script>
+
 
 <style scoped>
 .container {

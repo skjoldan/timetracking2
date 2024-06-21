@@ -3,7 +3,7 @@ import axios from 'axios';
 const token = localStorage.getItem('token');
 
 const axiosInstance = axios.create({
-  baseURL: '/api', // Use relative path
+  baseURL: 'http://localhost:3000/api',
   headers: {
     Authorization: token ? `Bearer ${token}` : ''
   }

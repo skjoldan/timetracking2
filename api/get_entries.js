@@ -2,14 +2,11 @@ const mysql = require('mysql');
 const { authenticate } = require('./_middleware/authenticate');
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-  });
-  
-  const jwtSecret = process.env.JWT_SECRET;
-  
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
+});
 
 export default function handler(req, res) {
   authenticate(req, res, () => {
