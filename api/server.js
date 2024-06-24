@@ -116,7 +116,6 @@ app.post('/api/add-entry', authenticate, (req, res) => {
   res.send({ status: 'OK', message: 'Entries received' });
 });
 
-
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
