@@ -14,7 +14,11 @@ const app = express();
 const corsOptions = {
   origin: (origin, callback) => {
     // Allow requests from Vercel subdomains and specific domains
-    if (!origin || /vercel\.app$/.test(origin) || origin === 'https://timetracking-murex.vercel.app') {
+    const whitelist = [
+      'https://timetracking-murex.vercel.app',
+      /\.vercel\.app$/
+    ];
+    if (whitelist.some(domain => domain instanceof RegExp ? domain.test(origin) : domain === origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
