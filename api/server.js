@@ -13,7 +13,7 @@ const app = express();
 // CORS configuration
 const corsOptions = {
   origin: [
-    'https://timetracking-murex.vercel.app', 
+    'https://timetracking-murex.vercel.app',
     /\.vercel\.app$/
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
