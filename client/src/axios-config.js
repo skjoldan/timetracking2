@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const token = localStorage.getItem('token');
-const baseURL = process.env.VUE_APP_API_BASE_URL || window.location.origin + '/api'; // Default to the origin if not set
+const baseURL = process.env.VUE_APP_API_BASE_URL || '/api';
 
-console.log("VUE_APP_API_BASE_URL in axios-config.js:", baseURL);
+console.log("API base URL in axios-config.js:", baseURL);
 
 const axiosInstance = axios.create({
   baseURL: baseURL,
