@@ -4,18 +4,22 @@ const mysql = require('mysql');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-require('dotenv').config(); // Load environment variables
+require('dotenv').config();
 
-const authenticate = require('./_middleware/authenticate'); // Import the middleware
+const authenticate = require('./_middleware/authenticate');
 
 const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: [
-    'https://timetracking-murex.vercel.app',
-    /\.vercel\.app$/
-  ],
+  origin: (origin, callback) => {
+    // Allow requests from Vercel subdomains and specific domains
+    if (!origin || /vercel\.app$/.test(origin) || origin === 'https://timetracking-murex.vercel.app') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
