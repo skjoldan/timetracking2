@@ -11,7 +11,17 @@ const authenticate = require('./_middleware/authenticate'); // Import the middle
 const app = express();
 
 // CORS configuration
-app.use(cors());
+const corsOptions = {
+  origin: 'https://timetracking-murex.vercel.app', // Your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
 app.use(bodyParser.json());
 
 const db = mysql.createConnection({
