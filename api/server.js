@@ -6,14 +6,18 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_PORT:', process.env.DB_PORT);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_NAME:', process.env.DB_NAME);
+
 const authenticate = require('./_middleware/authenticate');
 
 const app = express();
 
-// CORS configuration
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || /https:\/\/.*\.vercel\.app$/.test(origin)) {
+    if (!origin || /http:\/\/localhost:8080/.test(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -32,13 +36,23 @@ app.use(bodyParser.json());
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
 });
 
 db.connect((err) => {
-  if (err) throw err;
+  if (err) {
+    console.error('Error connecting to the database:', err);
+    console.error('Connection details:', {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      user: process.env.DB_USER,
+      database: process.env.DB_NAME
+    });
+    process.exit(1);
+  }
   console.log('Connected to the database');
 });
 
@@ -52,6 +66,7 @@ app.post('/api/register', async (req, res) => {
   const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
   db.query(query, [username, hashedPassword], (error, results) => {
     if (error) {
+      console.error('Error during registration:', error);
       return res.status(500).send(error);
     }
     res.send({ message: 'User registered successfully' });
@@ -65,19 +80,23 @@ app.post('/api/login', (req, res) => {
   const query = 'SELECT * FROM users WHERE username = ?';
   db.query(query, [username], async (error, results) => {
     if (error) {
+      console.error('Error during login:', error);
       return res.status(500).send(error);
     }
     if (results.length === 0) {
+      console.log('Invalid credentials for user:', username);
       return res.status(401).send({ message: 'Invalid credentials' });
     }
 
     const user = results[0];
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
+      console.log('Invalid credentials for user:', username);
       return res.status(401).send({ message: 'Invalid credentials' });
     }
 
     const token = jwt.sign({ username: user.username }, jwtSecret, { expiresIn: '1h' });
+    console.log('Login successful for user:', username);
     res.send({ token });
   });
 });
