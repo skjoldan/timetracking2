@@ -17,7 +17,7 @@ const app = express();
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || /http:\/\/localhost:8080/.test(origin)) {
+    if (!origin || /http:\/\/localhost:8080/.test(origin) || /https:\/\/.*\.vercel\.app$/.test(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
