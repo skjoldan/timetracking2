@@ -4,7 +4,8 @@ const mysql = require('mysql');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-require('dotenv').config();
+const path = require('path'); // Import path module
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 console.log('DB_HOST:', process.env.DB_HOST);
 console.log('DB_PORT:', process.env.DB_PORT);
